@@ -3,18 +3,17 @@ const AuthService = {
     // Return username & password from token
     parseToken(token) {
         return Buffer
-            .from(token, 'ascii')
+            .from(token, 'base64')
             .toString()
             .split(':')
     },
 
-    getToken() {
-
-    }
-    
-    
-    // Authenticate
-    // Validate no username, no password
+    getUserWithToken(db, user_name) {
+        return db('thingful_users')
+            .select('*') // Or just password?
+            .where({user_name})
+            .first()
+    },
 
 }
 

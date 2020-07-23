@@ -276,9 +276,11 @@ function seedMaliciousThing(db, user, thing) {
 }
 
 function makeAuthHeader(user) {
-  return Buffer
+  const token = Buffer
     .from(`${user.user_name}:${user.password}`)
     .toString('base64')
+
+  return `Basic ${token}`
 }
 
 module.exports = {
