@@ -230,6 +230,26 @@ function cleanTables(db) {
   )
 }
 
+// Use transaction and async/await for practice
+function seedUsersTable(db, users) {
+  return db.transaction(async trx => {
+    await trx('thingful_users').insert(users)
+    await trx.raw(
+      `SELECT setval('thingful_users_id_seq', ?)`,
+      [users[users.length-1].id],
+    )
+  })
+}
+
+// Refactor
+
+// aync function seedThingsTables(db, users, things, reviews=[]) {
+//   await seedUsersTable(db, users)
+//   await db('thingful_things').insert(things)
+
+//   await 
+// }
+
 function seedThingsTables(db, users, things, reviews=[]) {
   return db
     .into('thingful_users')
@@ -255,6 +275,12 @@ function seedMaliciousThing(db, user, thing) {
     )
 }
 
+function makeAuthHeader(user) {
+  return Buffer
+    .from(`${user.user_name}:${user.password}`)
+    .toString('base64')
+}
+
 module.exports = {
   makeUsersArray,
   makeThingsArray,
@@ -267,4 +293,6 @@ module.exports = {
   cleanTables,
   seedThingsTables,
   seedMaliciousThing,
+  makeAuthHeader,
+  seedUsersTable,
 }

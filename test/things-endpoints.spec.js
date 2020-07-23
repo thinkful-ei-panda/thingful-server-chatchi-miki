@@ -1,6 +1,7 @@
 const knex = require('knex')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
+const { makeAuthHeader, makeUsersArray } = require('./test-helpers')
 
 describe('Things Endpoints', function() {
   let db
@@ -24,6 +25,7 @@ describe('Things Endpoints', function() {
   before('cleanup', () => helpers.cleanTables(db))
 
   afterEach('cleanup', () => helpers.cleanTables(db))
+
   // Remains public, no authentication required
   describe(`GET /api/things`, () => {
     context(`Given no things`, () => {
@@ -87,10 +89,14 @@ describe('Things Endpoints', function() {
 
   describe(`GET /api/things/:thing_id`, () => {
     context(`Given no things`, () => {
+      const testUsers = helpers.makeUsersArray()
+      beforeEach('insert users', () => helpers.seedUsersTable(db, testUsers))
+
       it(`responds with 404`, () => {
         const thingId = 123456
         return supertest(app)
           .get(`/api/things/${thingId}`)
+          .set('Authorization', makeAuthHeader(testUsers[0]))
           .expect(404, { error: `Thing doesn't exist` })
       })
     })
